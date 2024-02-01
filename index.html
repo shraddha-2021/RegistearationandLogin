@@ -22,7 +22,9 @@
 
     <h2>Registeration</h2>
 
-    <form id="userForm">
+    <form id="userForm" action="" method="post" enctype="multipart/form-data">
+        <input type="hidden"  name="hideval" value="1">
+
         <label for="username">Name:</label>
         <input type="text" id="username" name="username" required><br>
 
@@ -35,7 +37,11 @@
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required><br>
 
-        <button type="button" onclick="createUser()">Create User</button>
+        <label for="upload">Upload File:</label><br>
+        <input type="file" id="upload" name="upload" accept="DOCTYPE/*"><br><br>
+
+
+        <button type="button" value="createuser" name="createuser" onclick="createUser()">Create User</button>
 
         
     </form>
@@ -46,7 +52,7 @@
 
     <h2>Login</h2>
     <form id="loginForm">
-        
+        <input type="hidden"  name="hideval" value="2">
 
         <label for="email">EmailId:</label>
         <input type="email" id="email" name="email" required><br>
@@ -55,7 +61,7 @@
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required><br>
 
-        <button type="button" onclick="loginUser()">Login</button>
+        <button type="button" value="login" name="login" onclick="loginUser()">Login</button>
 
         
     </form>
@@ -65,16 +71,30 @@
 
     <script>
         // Function to create a user using jQuery Ajax
-        function createUser() {
-            var data = $('#userForm').serializeArray();
-            data.push({name: 'action', value: 'create_user'});
+    function createUser() {
+          
+        var formData = new FormData();
+        var formArray = $('#userForm').serializeArray();
+
+        // Append form data excluding file input
+        $.each(formArray, function(i, field){
+            formData.append(field.name, field.value);
+        
+        });
+
+        // Append file data
+        var file = $('#upload')[0].files[0];
+        formData.append('file', file);
+
 
             $.ajax({
                 type: 'POST',
                 url: 'backend.php',
-                data: data,
+                data: formData,
+                contentType: false,
+                processData: false,
                 success: function (response) {
-                    
+                    alert(response);
                     if(response=='User created successfully'){
                         alert(response);
                     }else

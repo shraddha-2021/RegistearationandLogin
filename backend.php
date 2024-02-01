@@ -4,13 +4,14 @@ include('database.php');
 
 
 // user registeration form
-if ($_POST['action'] == 'create_user') {
+if ($_POST['hideval'] == '1') {
 
     $username = $_POST['username'];
     $email = $_POST['email'];
     $phone = $_POST['phone'];
     $password = md5($_POST['password']);
     
+     
     //Validation check and Error messages
     $errors = [];
 
@@ -44,15 +45,36 @@ if ($_POST['action'] == 'create_user') {
         echo "</ul>";
     } else 
     {
-        // Insert the user information into database
-        $stmt = $conn->prepare("INSERT INTO users (username,email,phone,password) VALUES (?, ?, ?,?)");
-        $stmt->bind_param("ssss", $username, $email,$phone,$password);
+        // Upload File 
 
-        if ($stmt->execute()) {
-            echo "User created successfully";
+        if ($_FILES['file']['error'] === UPLOAD_ERR_OK) {
+            $tempFile = $_FILES['file']['tmp_name'];
+            $fileName = $_FILES['file']['name'];
+            $uploadDir = 'uploads/';
+            $uploadPath = $uploadDir . $fileName;
+         
+            if (move_uploaded_file($tempFile, $uploadPath)) {
+                //echo "File uploaded successfully.";
+
+                // Insert the user information into database
+                    $stmt = $conn->prepare("INSERT INTO users (username,email,phone,password,uploadedfile) VALUES (?, ?, ?, ?, ?)");
+                    $stmt->bind_param("sssss", $username, $email,$phone,$password,$fileName);
+
+
+                    if ($stmt->execute()) {
+                        echo "User created successfully";
+                    } else {
+                        echo "Error creating user: " . $stmt->error;
+                    }
+
+            } else {
+                echo "Error uploading file.";
+            }
         } else {
-            echo "Error creating user: " . $stmt->error;
+            echo "File upload failed with error code " . $_FILES['file']['error'];
         }
+
+        
 
     
     $stmt->close();
@@ -61,7 +83,7 @@ if ($_POST['action'] == 'create_user') {
 
 
 
-if ($_POST['action'] == 'login_user') {
+if ($_POST['hideval'] == '2') {
    
   
     $email = $_POST['email'];  
