@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Management System</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    
+</head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+<body>
+    <div id="userList"></div>
+    <div class="container">
+        <div class="form-container">
+
+
+    <h2>Registeration</h2>
+
+    <form id="userForm">
+        <label for="username">Name:</label>
+        <input type="text" id="username" name="username" required><br>
+
+        <label for="email">EmailId:</label>
+        <input type="email" id="email" name="email" required><br>
+
+        <label for="phone">Mobile Number:</label>
+        <input type="number" id="phone" name="phone" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+
+        <button type="button" onclick="createUser()">Create User</button>
+
+        
+    </form>
+    
+    </div>
+
+    <div class="form-container">
+
+    <h2>Login</h2>
+    <form id="loginForm">
+        
+
+        <label for="email">EmailId:</label>
+        <input type="email" id="email" name="email" required><br>
+
+      
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+
+        <button type="button" onclick="loginUser()">Login</button>
+
+        
+    </form>
+    </div>
+
+    </div>
+
+    <script>
+        // Function to create a user using jQuery Ajax
+        function createUser() {
+            var data = $('#userForm').serializeArray();
+            data.push({name: 'action', value: 'create_user'});
+
+            $.ajax({
+                type: 'POST',
+                url: 'backend.php',
+                data: data,
+                success: function (response) {
+                    
+                    if(response=='User created successfully'){
+                        alert(response);
+                    }else
+                    {
+                        $("#userList").html(response); 
+                    }
+                    $('#userForm')[0].reset();
+                    
+                }
+            });
+        }
+
+        function loginUser() {
+            var data = $('#loginForm').serializeArray();
+            data.push({name: 'action', value: 'login_user'});
+
+            $.ajax({
+                type: 'POST',
+                url: 'backend.php',
+                data: data,
+                success: function (response) {
+                    $("#userList").html(response); 
+                    $('#loginForm')[0].reset();
+                    if(response=='User loggedIn successfully'){
+                        alert(response);
+                        window.location.href = 'login.php';
+                    }
+                }
+            });
+        }
+        
+        // Function to retrieve and display users using jQuery Ajax
+        /*function loadUsers() {
+            
+            $.ajax({
+                type: 'POST',
+                url: 'backend.php',
+                data: {action: 'get_users'},
+                dataType: 'json',
+                success: function (users) {
+                    
+                    var userList = '<h2>User List</h2>';
+                    userList += '<ul>';
+                    $.each(users, function (index, user) {
+                        userList += '<li>' + user.username + ' - ' + user.role + '</li>';
+                    });
+                    userList += '</ul>';
+                    $('#userList').html(userList);
+                }
+            });
+        }
+
+        // Initial load of users
+        loadUsers();*/
+    </script>
+</body>
+</html>
+
+
